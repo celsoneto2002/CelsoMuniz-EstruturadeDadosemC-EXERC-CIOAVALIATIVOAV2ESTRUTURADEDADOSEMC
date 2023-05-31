@@ -1,0 +1,530 @@
+//Questão 1
+
+#include <stdio.h>
+
+void bubbleSort(int arr[], int n) {
+    int i, j;
+    for (i = 0; i < n-1; i++) {
+        for (j = 0; j < n-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                
+                int temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+}
+
+void insertionSort(int arr[], int n) {
+    int i, key, j;
+    for (i = 1; i < n; i++) {
+        key = arr[i];
+        j = i - 1;
+
+        while (j >= 0 && arr[j] > key) {
+            arr[j + 1] = arr[j];
+            j = j - 1;
+        }
+        arr[j + 1] = key;
+    }
+}
+
+void printArray(int arr[], int n) {
+    int i;
+    for (i = 0; i < n; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int n, i, choice;
+
+    printf("Digite o tamanho do vetor: ");
+    scanf("%d", &n);
+
+    int arr[n];
+
+    printf("Digite os elementos do vetor:\n");
+    for (i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    printf("\nEscolha um método de ordenação:\n");
+    printf("1. Bubble Sort\n");
+    printf("2. Insertion Sort\n");
+    printf("Digite sua escolha: ");
+    scanf("%d", &choice);
+
+    switch (choice) {
+        case 1:
+            bubbleSort(arr, n);
+            printf("\nVetor ordenado usando Bubble Sort: ");
+            printArray(arr, n);
+            break;
+        case 2:
+            insertionSort(arr, n);
+            printf("\nVetor ordenado usando Insertion Sort: ");
+            printArray(arr, n);
+            break;
+        default:
+            printf("\nEscolha inválida. Saindo do programa.\n");
+            break;
+    }
+
+    return 0;
+}
+
+
+
+//Questão 2
+
+#include <stdio.h>
+#include <stdlib.h>
+
+
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+};
+
+
+struct StackNode {
+    int data;
+    struct StackNode* next;
+};
+
+struct Stack {
+    struct StackNode* top;
+};
+
+
+struct QueueNode {
+    int data;
+    struct QueueNode* next;
+};
+
+struct Queue {
+    struct QueueNode* front;
+    struct QueueNode* rear;
+};
+
+
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        printf("Erro ao alocar memória para o novo nó da árvore.\n");
+        exit(1);
+    }
+    newNode->data = data;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+struct Node* insert(struct Node* root, int data) {
+    if (root == NULL) {
+        root = createNode(data);
+    } else {
+        if (data <= root->data) {
+            root->left = insert(root->left, data);
+        } else {
+            root->right = insert(root->right, data);
+        }
+    }
+    return root;
+}
+
+struct Node* search(struct Node* root, int data) {
+    if (root == NULL || root->data == data) {
+        return root;
+    }
+    if (data < root->data) {
+        return search(root->left, data);
+    }
+    return search(root->right, data);
+}
+
+void printInOrder(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+    printInOrder(root->left);
+    printf("%d ", root->data);
+    printInOrder(root->right);
+}
+
+void printPostOrder(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+    printPostOrder(root->right);
+    printf("%d ", root->data);
+    printPostOrder(root->left);
+}
+
+int findMax(struct Node* root) {
+    if (root == NULL) {
+        printf("A árvore está vazia.\n");
+        return -1;
+    }
+    while (root->right != NULL) {
+        root = root->right;
+    }
+    return root->data;
+}
+
+
+struct StackNode* createStackNode(int data) {
+    struct StackNode* newNode = (struct StackNode*)malloc(sizeof(struct StackNode));
+    if (newNode == NULL) {
+        printf("Erro ao alocar memória para o novo nó da pilha.\n");
+        exit(1);
+    }
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+struct Stack* createStack() {
+    struct Stack* newStack = (struct Stack*)malloc(sizeof(struct Stack));
+    if (newStack == NULL) {
+        printf("Erro ao alocar memória para a nova pilha.\n");
+        exit(1);
+    }
+    newStack->top = NULL;
+    return newStack;
+}
+
+int isStackEmpty(struct Stack* stack) {
+    return (stack->top == NULL);
+}
+
+void push(struct Stack* stack, int data) {
+    struct StackNode* newNode = createStackNode(data);
+    newNode->next = stack->top;
+    stack->top = newNode;
+}
+
+int pop(struct Stack* stack) {
+    if (isStackEmpty(stack)) {
+        printf("A pilha está vazia.\n");
+        return -1;
+    }
+    struct StackNode* temp = stack->top;
+    int data = temp->data;
+    stack->top = stack->top->next;
+    free(temp);
+    return data;
+}
+
+void printStack(struct Stack* stack) {
+    if (isStackEmpty(stack)) {
+        printf("A pilha está vazia.\n");
+        return;
+    }
+    struct StackNode* current = stack->top;
+    printf("Elementos da pilha: ");
+    while (current != NULL) {
+        printf("%d ", current->data);
+        current = current->next;
+    }
+    printf("\n");
+}
+
+void clearStack(struct Stack* stack) {
+    while (!isStackEmpty(stack)) {
+        pop(stack);
+    }
+    printf("Pilha esvaziada.\n");
+}
+
+void printTop(struct Stack* stack) {
+    if (isStackEmpty(stack)) {
+        printf("A pilha está vazia.\n");
+        return;
+    }
+    printf("Topo da pilha: %d\n", stack->top->data);
+}
+
+
+struct QueueNode* createQueueNode(int data) {
+    struct QueueNode* newNode = (struct QueueNode*)malloc(sizeof(struct QueueNode));
+    if (newNode == NULL) {
+        printf("Erro ao alocar memória para o novo nó da fila.\n");
+        exit(1);
+    }
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+struct Queue* createQueue() {
+    struct Queue* newQueue = (struct Queue*)malloc(sizeof(struct Queue));
+    if (newQueue == NULL) {
+        printf("Erro ao alocar memória para a nova fila.\n");
+        exit(1);
+    }
+    newQueue->front = NULL;
+    newQueue->rear = NULL;
+    return newQueue;
+}
+
+int isQueueEmpty(struct Queue* queue) {
+    return (queue->front == NULL);
+}
+
+void enqueue(struct Queue* queue, int data) {
+    struct QueueNode* newNode = createQueueNode(data);
+    if (isQueueEmpty(queue)) {
+        queue->front = newNode;
+        queue->rear = newNode;
+    } else {
+        queue->rear->next = newNode;
+        queue->rear = newNode;
+    }
+}
+
+int dequeue(struct Queue* queue) {
+    if (isQueueEmpty(queue)) {
+        printf("A fila está vazia.\n");
+        return -1;
+    }
+    struct QueueNode* temp = queue->front;
+    int data = temp->data;
+    queue->front = queue->front->next;
+    free(temp);
+    if (queue->front == NULL) {
+        queue->rear = NULL;
+    }
+    return data;
+}
+
+void printQueue(struct Queue* queue) {
+    if (isQueueEmpty(queue)) {
+        printf("A fila está vazia.\n");
+        return;
+    }
+    struct QueueNode* current = queue->front;
+    printf("Elementos da fila: ");
+    while (current != NULL) {
+        printf("%d ", current->data);
+        current = current->next;
+    }
+    printf("\n");
+}
+
+void clearQueue(struct Queue* queue) {
+    while (!isQueueEmpty(queue)) {
+        dequeue(queue);
+    }
+    printf("Fila esvaziada.\n");
+}
+
+int getMaximum(struct Queue* queue) {
+    if (isQueueEmpty(queue)) {
+        printf("A fila está vazia.\n");
+        return -1;
+    }
+    int max = queue->front->data;
+    struct QueueNode* current = queue->front;
+    while (current != NULL) {
+        if (current->data > max) {
+            max = current->data;
+        }
+        current = current->next;
+    }
+    return max;
+}
+
+int getMinimum(struct Queue* queue) {
+    if (isQueueEmpty(queue)) {
+        printf("A fila está vazia.\n");
+        return -1;
+    }
+    int min = queue->front->data;
+    struct QueueNode* current = queue->front;
+    while (current != NULL) {
+        if (current->data < min) {
+            min = current->data;
+        }
+        current = current->next;
+    }
+    return min;
+}
+
+
+int main() {
+    int choice;
+    int data;
+    struct Node* root = NULL;
+    struct Stack* stack = createStack();
+    struct Queue* queue = createQueue();
+
+    do {
+        printf("Menu:\n");
+        printf("1. Executar Pilha\n");
+        printf("2. Executar Fila\n");
+        printf("3. Executar Árvore\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                do {
+                    printf("\nOperações da Pilha:\n");
+                    printf("1. Empilhar\n");
+                    printf("2. Desempilhar\n");
+                    printf("3. Imprimir Pilha\n");
+                    printf("4. Limpar Pilha\n");
+                    printf("5. Imprimir Topo da Pilha\n");
+                    printf("0. Voltar\n");
+                    printf("Escolha uma opção: ");
+                    scanf("%d", &choice);
+
+                    switch (choice) {
+                        case 1:
+                            printf("Digite o valor a ser empilhado: ");
+                            scanf("%d", &data);
+                            push(stack, data);
+                            printf("Elemento %d empilhado com sucesso.\n", data);
+                            break;
+                        case 2:
+                            data = pop(stack);
+                            if (data != -1) {
+                                printf("Elemento %d desempilhado com sucesso.\n", data);
+                            }
+                            break;
+                        case 3:
+                            printStack(stack);
+                            break;
+                        case 4:
+                            clearStack(stack);
+                            break;
+                        case 5:
+                            printTop(stack);
+                            break;
+                        case 0:
+                            break;
+                        default:
+                            printf("Opção inválida. Por favor, escolha uma opção válida.\n");
+                    }
+                } while (choice != 0);
+                break;
+
+            case 2:
+                do {
+                    printf("\nOperações da Fila:\n");
+                    printf("1. Enqueue\n");
+                    printf("2. Dequeue\n");
+                    printf("3. Imprimir Fila\n");
+                    printf("4. Limpar Fila\n");
+                    printf("5. Maior Elemento da Fila\n");
+                    printf("6. Menor Elemento da Fila\n");
+                    printf("0. Voltar\n");
+                    printf("Escolha uma opção: ");
+                    scanf("%d", &choice);
+
+                    switch (choice) {
+                        case 1:
+                            printf("Digite o valor a ser enfileirado: ");
+                            scanf("%d", &data);
+                            enqueue(queue, data);
+                            printf("Elemento %d enfileirado com sucesso.\n", data);
+                            break;
+                        case 2:
+                            data = dequeue(queue);
+                            if (data != -1) {
+                                printf("Elemento %d desenfileirado com sucesso.\n", data);
+                            }
+                            break;
+                        case 3:
+                            printQueue(queue);
+                            break;
+                        case 4:
+                            clearQueue(queue);
+                            break;
+                        case 5:
+                            data = getMaximum(queue);
+                            printf("Maior elemento da fila: %d\n", data);
+                            break;
+                        case 6:
+                            data = getMinimum(queue);
+                            printf("Menor elemento da fila: %d\n", data);
+                            break;
+                        case 0:
+                            break;
+                        default:
+                            printf("Opção inválida. Por favor, escolha uma opção válida.\n");
+                    }
+                } while (choice != 0);
+                break;
+
+            case 3:
+                do {
+                    printf("\nOperações da Árvore:\n");
+                    printf("1. Inserir Elemento\n");
+                    printf("2. Buscar Elemento\n");
+                    printf("3. Imprimir Árvore (Em Ordem)\n");
+                    printf("4. Imprimir Árvore (Pós-Ordem)\n");
+                    printf("5. Encontrar Maior Elemento\n");
+                    printf("0. Voltar\n");
+                    printf("Escolha uma opção: ");
+                    scanf("%d", &choice);
+
+                    switch (choice) {
+                        case 1:
+                            printf("Digite o valor a ser inserido na árvore: ");
+                            scanf("%d", &data);
+                            root = insert(root, data);
+                            printf("Elemento %d inserido na árvore com sucesso.\n", data);
+                            break;
+                        case 2:
+                            printf("Digite o valor a ser buscado na árvore: ");
+                            scanf("%d", &data);
+                            struct Node* found = search(root, data);
+                            if (found != NULL) {
+                                printf("Elemento %d encontrado na árvore.\n", data);
+                            } else {
+                                printf("Elemento %d não encontrado na árvore.\n", data);
+                            }
+                            break;
+                        case 3:
+                            printf("Árvore (Em Ordem): ");
+                            printInOrder(root);
+                            printf("\n");
+                            break;
+                        case 4:
+                            printf("Árvore (Pós-Ordem): ");
+                            printPostOrder(root);
+                            printf("\n");
+                            break;
+                        case 5:
+                            data = findMax(root);
+                            if (data != -1) {
+                                printf("Maior elemento da árvore: %d\n", data);
+                            }
+                            break;
+                        case 0:
+                            break;
+                        default:
+                            printf("Opção inválida. Por favor, escolha uma opção válida.\n");
+                    }
+                } while (choice != 0);
+                break;
+
+            case 0:
+                break;
+
+            default:
+                printf("Opção inválida. Por favor, escolha uma opção válida.\n");
+        }
+    } while (choice != 0);
+
+    return 0;
+}
+
+
